@@ -37,8 +37,8 @@ export const validateMovieForm = (movieForm) => {
         errors.coordinatesY = 'Координата Y должна быть не больше 462'
     }
 
-    if (!movieForm.directorId) {
-        errors.directorId = 'Режиссер обязателен'
+    if (!movieForm.directorReference || !movieForm.directorReference.id) {
+        errors.directorReference = 'Режиссер обязателен'
     }
 
     return errors

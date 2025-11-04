@@ -9,7 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.itmo.se.is.annotation.ValidEmbedded;
+import ru.itmo.se.is.dto.EmbeddedObjectDto;
 import ru.itmo.se.is.dto.coordinates.CoordinatesRequestDto;
+import ru.itmo.se.is.dto.person.PersonRequestDto;
 import ru.itmo.se.is.entity.value.MovieGenre;
 import ru.itmo.se.is.entity.value.MpaaRating;
 
@@ -43,13 +46,19 @@ public class MovieRequestDto implements Serializable {
     private MpaaRating mpaaRating;
 
     @NotNull
-    private Long directorId;
+    @ValidEmbedded
+    @Valid
+    private EmbeddedObjectDto<Long, PersonRequestDto> directorReference;
 
     @Nullable
-    private Long screenwriterId;
+    @ValidEmbedded(nullable = true)
+    @Valid
+    private EmbeddedObjectDto<Long, PersonRequestDto> screenwriterReference;
 
     @Nullable
-    private Long operatorId;
+    @ValidEmbedded(nullable = true)
+    @Valid
+    private EmbeddedObjectDto<Long, PersonRequestDto> operatorReference;
 
     @Nullable
     @Positive

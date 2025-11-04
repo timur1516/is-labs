@@ -16,9 +16,9 @@ const MovieForm = ({movie, onSubmit, onCancel, loading}) => {
         budget: 0,
         totalBoxOffice: 0,
         mpaaRating: null,
-        directorId: null,
-        screenwriterId: null,
-        operatorId: null,
+        directorReference: { id: null, value: null },
+        screenwriterReference: { id: null, value: null },
+        operatorReference: { id: null, value: null },
         length: null,
         goldenPalmCount: 0,
         usaBoxOffice: 0,
@@ -47,9 +47,18 @@ const MovieForm = ({movie, onSubmit, onCancel, loading}) => {
                 budget: movie.budget || 0,
                 totalBoxOffice: movie.totalBoxOffice || 0,
                 mpaaRating: movie.mpaaRating || null,
-                directorId: movie.director?.id || null,
-                screenwriterId: movie.screenwriter?.id || null,
-                operatorId: movie.operator?.id || null,
+                directorReference: movie.directorReference || {
+                    id: movie.director?.id ?? null,
+                    value: null
+                },
+                screenwriterReference: movie.screenwriterReference || {
+                    id: movie.screenwriter?.id ?? null,
+                    value: null
+                },
+                operatorReference: movie.operatorReference || {
+                    id: movie.operator?.id ?? null,
+                    value: null
+                },
                 length: movie.length || null,
                 goldenPalmCount: movie.goldenPalmCount || 0,
                 usaBoxOffice: movie.usaBoxOffice || 0,
@@ -133,6 +142,16 @@ const MovieForm = ({movie, onSubmit, onCancel, loading}) => {
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({...prev, [field]: value}))
+    }
+
+    const handleReferenceChange = (field, id) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: {
+                id,
+                value: null
+            }
+        }))
     }
 
     const handleCoordinatesChange = (field, value) => {
@@ -302,13 +321,13 @@ const MovieForm = ({movie, onSubmit, onCancel, loading}) => {
                     <div className="form-field">
                         <label>Режиссер *</label>
                         <Dropdown
-                            value={formData.directorId}
+                            value={formData.directorReference?.id ?? null}
                             options={directors}
-                            onChange={(e) => handleInputChange('directorId', e.value)}
+                            onChange={(e) => handleReferenceChange('directorReference', e.value)}
                             optionLabel="name"
                             optionValue="id"
                             placeholder="Выберите режиссера"
-                            className={classNames({'p-invalid': errors.directorId})}
+                            className={classNames({'p-invalid': errors.directorReference})}
                             style={{width: '100%'}}
                             virtualScrollerOptions={{
                                 itemSize: 38,
@@ -319,15 +338,15 @@ const MovieForm = ({movie, onSubmit, onCancel, loading}) => {
                                 }
                             }}
                         />
-                        {errors.directorId && <small className="p-error">{errors.directorId}</small>}
+                        {errors.directorReference && <small className="p-error">{errors.directorReference}</small>}
                     </div>
 
                     <div className="form-field">
                         <label>Сценарист</label>
                         <Dropdown
-                            value={formData.screenwriterId}
+                            value={formData.screenwriterReference?.id ?? null}
                             options={screenwriters}
-                            onChange={(e) => handleInputChange('screenwriterId', e.value)}
+                            onChange={(e) => handleReferenceChange('screenwriterReference', e.value)}
                             optionLabel="name"
                             optionValue="id"
                             placeholder="Выберите сценариста"
@@ -346,9 +365,9 @@ const MovieForm = ({movie, onSubmit, onCancel, loading}) => {
                     <div className="form-field">
                         <label>Оператор</label>
                         <Dropdown
-                            value={formData.operatorId}
+                            value={formData.operatorReference?.id ?? null}
                             options={operators}
-                            onChange={(e) => handleInputChange('operatorId', e.value)}
+                            onChange={(e) => handleReferenceChange('operatorReference', e.value)}
                             optionLabel="name"
                             optionValue="id"
                             placeholder="Выберите оператора"
