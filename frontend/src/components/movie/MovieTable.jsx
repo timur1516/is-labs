@@ -20,7 +20,7 @@ const MovieTable = ({
     const ws = useRef(null);
 
     useEffect(() => {
-        ws.current = new WebSocket(`${WS_BASE_PATH}/ws`);
+        ws.current = new WebSocket(`${WS_BASE_PATH}`);
 
         ws.current.onopen = () => {
             console.log('WebSocket connected for movies');

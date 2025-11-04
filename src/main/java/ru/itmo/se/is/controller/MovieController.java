@@ -11,7 +11,7 @@ import ru.itmo.se.is.dto.movie.MovieLazyBeanParamDto;
 import ru.itmo.se.is.dto.movie.MovieRequestDto;
 import ru.itmo.se.is.dto.movie.MovieResponseDto;
 import ru.itmo.se.is.service.MovieService;
-import ru.itmo.se.is.websocket.WebSocketEndpoint;
+import ru.itmo.se.is.service.NotificationService;
 import ru.itmo.se.is.websocket.WebSocketMessageType;
 
 import java.net.URI;
@@ -23,6 +23,8 @@ public class MovieController {
 
     @Inject
     private MovieService service;
+    @Inject
+    private NotificationService notificationService;
 
     @GET
     public Response getAllMovies(@Valid @BeanParam MovieLazyBeanParamDto lazyBeanParamDto) {
@@ -38,7 +40,7 @@ public class MovieController {
                 .resolveTemplate("id", createdMovie.getId())
                 .build();
 
-        WebSocketEndpoint.broadcast(WebSocketMessageType.MOVIE);
+        notificationService.notifyAll(WebSocketMessageType.MOVIE);
 
         return Response.created(location).entity(createdMovie).build();
     }
@@ -47,7 +49,7 @@ public class MovieController {
     @Path("/{id}")
     public Response updateMovie(@PathParam("id") long id, @Valid MovieRequestDto dto) {
         service.update(id, dto);
-        WebSocketEndpoint.broadcast(WebSocketMessageType.MOVIE);
+        notificationService.notifyAll(WebSocketMessageType.MOVIE);
         return Response.noContent().build();
     }
 
@@ -55,7 +57,7 @@ public class MovieController {
     @Path("/{id}")
     public Response deleteMovie(@PathParam("id") long id) {
         service.delete(id);
-        WebSocketEndpoint.broadcast(WebSocketMessageType.MOVIE);
+        notificationService.notifyAll(WebSocketMessageType.MOVIE);
         return Response.noContent().build();
     }
 
@@ -87,7 +89,7 @@ public class MovieController {
     @Path("/add-oscar-to-r-rated")
     public Response addOscarToRated() {
         service.addOscarToRated();
-        WebSocketEndpoint.broadcast(WebSocketMessageType.MOVIE);
+        notificationService.notifyAll(WebSocketMessageType.MOVIE);
         return Response.noContent().build();
     }
 }

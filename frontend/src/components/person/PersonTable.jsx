@@ -18,10 +18,10 @@ const PersonTable = ({
     const ws = useRef(null);
 
     useEffect(() => {
-        ws.current = new WebSocket(`${WS_BASE_PATH}/ws`);
+        ws.current = new WebSocket(`${WS_BASE_PATH}`);
 
         ws.current.onopen = () => {
-            console.log('WebSocket connected for movies');
+            console.log('WebSocket connected for person');
         };
 
         ws.current.onmessage = (event) => {
@@ -36,7 +36,7 @@ const PersonTable = ({
         };
 
         ws.current.onclose = () => {
-            console.log('WebSocket disconnected for movies');
+            console.log('WebSocket disconnected for person');
         };
 
         return () => {
