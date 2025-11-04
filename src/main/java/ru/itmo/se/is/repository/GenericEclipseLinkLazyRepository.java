@@ -7,6 +7,7 @@ import org.eclipse.persistence.expressions.ExpressionBuilder;
 import org.eclipse.persistence.queries.ReadAllQuery;
 import org.eclipse.persistence.queries.ReportQuery;
 import org.eclipse.persistence.sessions.DatabaseSession;
+import org.eclipse.persistence.sessions.UnitOfWork;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public abstract class GenericEclipseLinkLazyRepository<T> implements LazyReposit
 
     @Override
     public long count(Map<String, Object> filterBy) {
+        UnitOfWork uow = session.getActiveUnitOfWork();
         ExpressionBuilder builder = new ExpressionBuilder();
 
         ReportQuery query = new ReportQuery(entityClass, builder);
@@ -28,13 +30,14 @@ public abstract class GenericEclipseLinkLazyRepository<T> implements LazyReposit
 
         applyFilters(query, builder, filterBy);
 
-        Number count = (Number) session.executeQuery(query);
+        Number count = (Number) uow.executeQuery(query);
         return count.longValue();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<T> load(int first, int pageSize, String sortField, int sortOrder, Map<String, Object> filterBy) {
+        UnitOfWork uow = session.getActiveUnitOfWork();
         ExpressionBuilder builder = new ExpressionBuilder();
 
         ReadAllQuery query = new ReadAllQuery(entityClass);
@@ -45,7 +48,7 @@ public abstract class GenericEclipseLinkLazyRepository<T> implements LazyReposit
         query.setFirstResult(first);
         query.setMaxRows(pageSize);
 
-        return (List<T>) session.executeQuery(query);
+        return (List<T>) uow.executeQuery(query);
     }
 
     private void applySort(ReadAllQuery query, ExpressionBuilder builder, String sortField, int sortOrder) {

@@ -23,27 +23,33 @@ public abstract class GenericEclipseLinkRepository<T, ID> implements Repository<
 
     @Override
     public List<T> findAll() {
-        ReadAllQuery query = new ReadAllQuery(entityClass);
-        return (List<T>) session.executeQuery(query);
+        UnitOfWork uow = session.getActiveUnitOfWork();
+        return (List<T>) uow.readAllObjects(entityClass);
     }
 
     @Override
     public Optional<T> findById(ID id) {
-        ReadObjectQuery query = new ReadObjectQuery(entityClass);
-        query.setSelectionCriteria(new ExpressionBuilder().get("id").equal(id));
-        T entity = (T) session.executeQuery(query);
+        UnitOfWork uow = session.getActiveUnitOfWork();
+        ExpressionBuilder b = new ExpressionBuilder();
+        T entity = (T) uow.readObject(
+                entityClass,
+                b.get("id").equal(id)
+        );
         return Optional.ofNullable(entity);
     }
 
     @Override
     public T save(T entity) {
-        session.insertObject(entity);
-        return entity;
+        UnitOfWork uow = session.getActiveUnitOfWork();
+        T managed = (T) uow.registerNewObject(entity);
+        registerNestedFields(uow, managed);
+        uow.writeChanges();
+        return managed;
     }
 
     public void update(T entity, Consumer<T> fieldUpdater) {
         UnitOfWork uow = session.getActiveUnitOfWork();
-        T managed = (T) uow.deepMergeClone(entity);
+        T managed = (T) uow.readObject(entity);
         fieldUpdater.accept(managed);
         registerNestedFields(uow, managed);
     }
@@ -51,9 +57,7 @@ public abstract class GenericEclipseLinkRepository<T, ID> implements Repository<
     @Override
     public void deleteById(ID id) {
         UnitOfWork uow = session.getActiveUnitOfWork();
-        DeleteAllQuery query = new DeleteAllQuery(entityClass);
-        query.setSelectionCriteria(new ExpressionBuilder().get("id").equal(id));
-        uow.executeQuery(query);
+        findById(id).ifPresent(uow::deleteObject);
     }
 
     protected abstract void registerNestedFields(UnitOfWork uow, T entity);

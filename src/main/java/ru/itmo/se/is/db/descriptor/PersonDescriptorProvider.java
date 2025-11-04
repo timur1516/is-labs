@@ -85,6 +85,8 @@ public class PersonDescriptorProvider {
         lockingPolicy.storeInObject();
         lockingPolicy.setIsCascaded(false);
         descriptor.setOptimisticLockingPolicy(lockingPolicy);
+        descriptor.useNoIdentityMap();
+        descriptor.getQueryManager().setExistenceCheck("Check database");
         return descriptor;
     }
 }

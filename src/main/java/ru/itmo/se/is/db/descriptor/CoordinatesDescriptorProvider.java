@@ -27,7 +27,8 @@ public class CoordinatesDescriptorProvider {
         yMapping.setAttributeName("y");
         yMapping.setFieldName("y");
         descriptor.addMapping(yMapping);
-
+        descriptor.useNoIdentityMap();
+        descriptor.getQueryManager().setExistenceCheck("Check database");
         return descriptor;
     }
 }

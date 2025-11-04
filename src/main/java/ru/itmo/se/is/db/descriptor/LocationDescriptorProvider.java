@@ -32,7 +32,8 @@ public class LocationDescriptorProvider {
         z.setAttributeName("z");
         z.setFieldName("z");
         descriptor.addMapping(z);
-
+        descriptor.useNoIdentityMap();
+        descriptor.getQueryManager().setExistenceCheck("Check database");
         return descriptor;
     }
 }

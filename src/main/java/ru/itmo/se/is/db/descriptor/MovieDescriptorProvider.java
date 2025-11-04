@@ -147,6 +147,8 @@ public class MovieDescriptorProvider {
         lockingPolicy.storeInObject();
         lockingPolicy.setIsCascaded(false);
         descriptor.setOptimisticLockingPolicy(lockingPolicy);
+        descriptor.useNoIdentityMap();
+        descriptor.getQueryManager().setExistenceCheck("Check database");
         return descriptor;
     }
 }
