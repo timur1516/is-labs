@@ -53,4 +53,19 @@ public class EclipseLinkPersonRepository
         Person person = (Person) uow.executeQuery(query);
         return Optional.ofNullable(person);
     }
+
+    @Override
+    public boolean existsByNameAndIdNot(String name, Long id) {
+        UnitOfWork uow = unitOfWorkManager.getCurrent();
+        ExpressionBuilder builder = new ExpressionBuilder(Person.class);
+        Expression expression = builder.get("name").equal(name)
+                .and(builder.get("id").notEqual(id));
+
+        ReadObjectQuery query = new ReadObjectQuery(Person.class);
+        query.setSelectionCriteria(expression);
+        query.conformResultsInUnitOfWork();
+
+        Person result = (Person) uow.executeQuery(query);
+        return result != null;
+    }
 }

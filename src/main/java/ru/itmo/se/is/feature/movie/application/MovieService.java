@@ -56,7 +56,7 @@ public class MovieService {
 
         movie.setCreationDate(ZonedDateTime.now());
 
-        checkUniqueConstraint(movie);
+        checkCreateUniqueConstraint(movie);
         Movie savedMovie = movieRepository.save(movie);
 
         return savedMovie;
@@ -66,13 +66,25 @@ public class MovieService {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Movie with id %d not found", id)));
         Movie updatedMovie = mapper.toMovie(dto);
+        updatedMovie.setId(id);
 
-        checkUniqueConstraint(updatedMovie);
+        checkUpdateUniqueConstraint(updatedMovie);
         movieRepository.update(movie, (m) -> mapper.toMovie(dto, m));
     }
 
-    private void checkUniqueConstraint(Movie movie) {
+    private void checkCreateUniqueConstraint(Movie movie) {
         if (movieRepository.existsByNameAndDirectorName(movie.getName(), movie.getDirector().getName())) {
+            throw new EntityAlreadyExistsException(
+                    String.format("Movie with name '%s' and director '%s' already exists",
+                            movie.getName(),
+                            movie.getDirector().getName()
+                    )
+            );
+        }
+    }
+
+    private void checkUpdateUniqueConstraint(Movie movie) {
+        if (movieRepository.existsByNameAndDirectorNameAndIdNot(movie.getName(), movie.getDirector().getName(), movie.getId())) {
             throw new EntityAlreadyExistsException(
                     String.format("Movie with name '%s' and director '%s' already exists",
                             movie.getName(),

@@ -29,7 +29,7 @@ public class PersonService {
     public Person create(@Valid PersonRequestDto dto) {
         Person person = mapper.toPerson(dto);
 
-        checkUniqueConstraint(person);
+        checkCreateUniqueConstraint(person);
         Person savedPerson = personRepository.save(person);
 
         return savedPerson;
@@ -48,13 +48,22 @@ public class PersonService {
         Person person = personRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Person with id %d not found", id)));
         Person updatedPerson = mapper.toPerson(dto);
+        updatedPerson.setId(id);
 
-        checkUniqueConstraint(updatedPerson);
+        checkUpdateUniqueConstraint(updatedPerson);
         personRepository.update(person, (p) -> mapper.toPerson(dto, p));
     }
 
-    private void checkUniqueConstraint(Person person) {
+    private void checkCreateUniqueConstraint(Person person) {
         if (personRepository.existsByName(person.getName())) {
+            throw new EntityAlreadyExistsException(
+                    String.format("Person with name %s already exists", person.getName())
+            );
+        }
+    }
+
+    private void checkUpdateUniqueConstraint(Person person) {
+        if (personRepository.existsByNameAndIdNot(person.getName(), person.getId())) {
             throw new EntityAlreadyExistsException(
                     String.format("Person with name %s already exists", person.getName())
             );

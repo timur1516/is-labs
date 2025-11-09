@@ -41,6 +41,23 @@ public class EclipseLinkMovieRepository
     }
 
     @Override
+    public boolean existsByNameAndDirectorNameAndIdNot(String name, String directorName, Long id) {
+        UnitOfWork uow = unitOfWorkManager.getCurrent();
+        ExpressionBuilder builder = new ExpressionBuilder(Movie.class);
+
+        Expression expression = builder.get("name").equal(name)
+                .and(builder.get("director").get("name").equal(directorName))
+                .and(builder.get("id").notEqual(id));
+
+        ReadObjectQuery query = new ReadObjectQuery(Movie.class);
+        query.setSelectionCriteria(expression);
+        query.conformResultsInUnitOfWork();
+
+        Movie result = (Movie) uow.executeQuery(query);
+        return result != null;
+    }
+
+    @Override
     protected void registerNestedFields(UnitOfWork uow, Movie movie) {
         if (movie.getDirector() != null) {
             movie.setDirector((Person) uow.registerObject(movie.getDirector()));

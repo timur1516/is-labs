@@ -8,4 +8,6 @@ public interface PersonRepository extends PagingAndSortingRepository<Person, Lon
     boolean existsByName(String name);
 
     Optional<Person> findByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }
